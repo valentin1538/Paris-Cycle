@@ -126,3 +126,8 @@ PWA_APP_BACKGROUND_COLOR = '#ffffff'
 PWA_APP_ICONS = [
     {'src': '/static/images/icon-192.png', 'sizes': '192x192'}
 ]
+
+import os
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
