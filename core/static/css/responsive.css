@@ -1,0 +1,62 @@
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    color: #002542; /* Bleu anthracite */
+}
+
+
+@media (max-width: 768px) {
+
+    /* Structure générale */
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+
+    /* Navbar */
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav a {
+        padding: 10px 0;
+        display: block;
+    }
+
+    /* Carte Leaflet */
+    #map {
+        height: 60vh !important;
+        width: 100%;
+    }
+
+    /* Actualités */
+    .news-card img {
+        width: 100%;
+        height: auto;
+    }
+
+    .news-card {
+        padding: 10px;
+    }
+
+    /* Boutons */
+    button,
+    .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+    }
+
+    /* Sections */
+    .section {
+        margin-bottom: 20px;
+    }
+}
