@@ -1,19 +1,4 @@
-"""
-URL configuration for paris_cycle project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
+from django import views
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -29,6 +14,9 @@ urlpatterns = [
 
     # 3. Les routes nécessaires pour la PWA (Service Worker, etc.)
     path('', include('pwa.urls')),
+    
+    # 4. L'API pour les stations Vélib'
+    path("api/bikes/", include("core.urls")),
 ]
 
 # 4. Configuration pour afficher les images des articles en développement
