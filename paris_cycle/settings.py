@@ -115,19 +115,48 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
+import os
 
 STATIC_URL = 'static/'
 
-# Config PWA de base (Charte Ville de Paris)
-PWA_APP_NAME = 'Paris Cycle'
-PWA_APP_DESCRIPTION = "Données vélo à Paris"
-PWA_APP_THEME_COLOR = '#002b4c'  # Le bleu anthracite de la charte
-PWA_APP_BACKGROUND_COLOR = '#ffffff'
-PWA_APP_ICONS = [
-    {'src': '/static/images/icon-192.png', 'sizes': '192x192'}
+# Le dossier où TOI tu mets tes images de développement (ex: ton logo SVG)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
 ]
 
-import os
+# Le dossier où DJANGO va tout copier/rassembler quand tu fais 'collectstatic'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Config PWA de base (Charte Ville de Paris)
+# PWA Settings
+PWA_APP_NAME = 'Paris Cycle'
+PWA_APP_DESCRIPTION = "Application vélo de la Ville de Paris"
+PWA_APP_THEME_COLOR = '#002b4c'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = 'default'
+PWA_APP_ICONS = [
+    {
+        'src': '/static/images/logo_512.jpg', # <--- Ton nouveau fichier PNG
+        'sizes': '512x512',
+        'type': 'image/png', # <--- TRÈS IMPORTANT : Préciser que c'est un PNG
+        'purpose': 'any maskable'
+    }
+]
+PWA_APP_ICONS_APPLE = [
+    {
+        'src': '/static/images/logo_512.jpg',
+        'sizes': '512x512',
+        'type': 'image/png'
+    }
+]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'fr-FR'
+
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -1,61 +1,216 @@
 {% load static %}
+{% load pwa %} 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paris Cycle</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    <title>Paris Cycle - Ville de Paris</title>
     
-    <!-- Leaflet CSS -->
+    {% progressive_web_app_meta %}
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
-        body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; }
-        header { background: #002b4c; color: white; padding: 1rem; text-align: center; }
-        #map { height: 500px; width: 100%; }
-        .news-container { padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; }
-        .news-card { border: 1px solid #ddd; padding: 10px; width: 300px; }
-        .news-card img { width: 100%; height: auto; }
+        /* --- Variables Design --- */
+        :root {
+            --bleu-anthracite: #002b4c;
+            --jaune-paris: #f4c242;
+            --fond-gris: #f8f9fa;
+            --blanc: #ffffff;
+            --texte-sombre: #333333;
+        }
 
-        /* Popup */
-        .popup-title { font-weight: bold; color: #002b4c; margin-bottom: 0.4rem; }
-        .popup-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.85rem; margin-top: 0.3rem; }
-        .badge { padding: 2px 8px; border-radius: 12px; font-weight: bold; color: white; }
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--fond-gris);
+            color: var(--texte-sombre);
+        }
+
+        /* --- HEADER --- */
+        header {
+            background-color: var(--bleu-anthracite);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .logo-container img {
+            height: 60px;
+        }
+
+        /* Bouton PWA */
+        #install-btn {
+            background-color: var(--blanc);
+            color: var(--bleu-anthracite);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: none; /* Affiché via JS */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        #install-btn:hover { transform: scale(1.05); }
+
+        /* --- STRUCTURE PRINCIPALE --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            font-weight: 700;
+            color: var(--bleu-anthracite);
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            border-bottom: 3px solid var(--jaune-paris);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* --- CARTE --- */
+        .map-section { margin-bottom: 40px; }
+        #map { 
+            height: 500px; 
+            width: 100%; 
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid var(--blanc);
+            z-index: 1; 
+        }
+
+        /* --- POPUP LEAFLET (Ton code embelli) --- */
+        .popup-title { font-weight: 700; color: var(--bleu-anthracite); margin-bottom: 0.4rem; font-size: 1.05rem;}
+        .popup-row { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; font-size: 0.85rem; margin-top: 0.4rem; border-bottom: 1px solid #eee; padding-bottom: 4px;}
+        .popup-row:last-child { border-bottom: none; }
+        .badge { padding: 3px 8px; border-radius: 12px; font-weight: bold; color: white; font-size: 0.75rem;}
         .badge-green { background: #2e7d32; }
         .badge-orange { background: #e65100; }
         .badge-blue { background: #1565c0; }
+
+        /* --- ACTUALITÉS --- */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .news-card {
+            background: var(--blanc);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+        .news-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        .news-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #e0e0e0;
+        }
+
+        .news-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .news-content small {
+            font-size: 0.8rem;
+            color: #777;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .news-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            color: var(--bleu-anthracite);
+        }
+
+        .news-content p {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; }
+            #install-btn { align-self: flex-end; }
+            .logo-container img { height: 45px; }
+        }
     </style>
 </head>
 <body>
+
     <header>
-        <h1>PARIS CYCLE</h1>
+        <div style="width: 150px;"></div> <div class="logo-container">
+            <img src="{% static 'images/logo_paris_cycle.png' %}" alt="Paris Cycle - Ville de Paris">
+        </div>
+        
+        <button id="install-btn">📱 Installer l'App</button>
     </header>
 
-    <!-- CARTE LEAFLET -->
-    <div id="map"></div>
+    <div class="container">
+        <section class="map-section">
+            <h2>Carte des Stations</h2>
+            <div id="map"></div>
+        </section>
 
-    <!-- ACTUALITÉS -->
-    <section class="news-container">
-        {% for article in articles %}
-            <div class="news-card">
-                {% if article.image %}
-                    <img src="{{ article.image.url }}" alt="{{ article.titre }}">
-                {% endif %}
-                <h3>{{ article.titre }}</h3>
-                <p>{{ article.contenu|truncatewords:20 }}</p>
-                <small>{{ article.date_publication|date:"d/m/Y" }}</small>
+        <section class="news-section">
+            <h2>Dernières Actualités</h2>
+            <div class="news-grid">
+                {% for article in articles %}
+                    <div class="news-card">
+                        {% if article.image %}
+                            <img src="{{ article.image.url }}" alt="{{ article.titre }}" class="news-image">
+                        {% else %}
+                            <div class="news-image"></div>
+                        {% endif %}
+                        <div class="news-content">
+                            <small>{{ article.date_publication|date:"d/m/Y" }}</small>
+                            <h3>{{ article.titre }}</h3>
+                            <p>{{ article.contenu|truncatewords:20 }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
-    </section>
+        </section>
+    </div>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
+        // --- 1. TON CODE LEAFLET (Intact) ---
         const stations = {{ stations_json|safe }};
-
         const map = L.map('map').setView([48.8566, 2.3522], 13);
 
         const primaryTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -112,7 +267,7 @@
             L.marker([lat, lon], { icon: makeIcon(color) })
                 .bindPopup(`
                     <div class="popup-title">${station.name}</div>
-                    <div style="font-size:0.8rem;color:#666">${station.nom_arrondissement_communes || ''}</div>
+                    <div style="font-size:0.8rem;color:#666;margin-bottom:8px;">${station.nom_arrondissement_communes || ''}</div>
                     <div class="popup-row">
                         <span>🚲 Vélos dispo</span>
                         <span class="badge badge-green">${station.numbikesavailable ?? '?'}</span>
@@ -138,6 +293,27 @@
         if (markerBounds.length > 0) {
             map.fitBounds(markerBounds, { padding: [24, 24] });
         }
+
+        // --- 2. GESTION DU BOUTON PWA ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
     </script>
 </body>
 </html>
